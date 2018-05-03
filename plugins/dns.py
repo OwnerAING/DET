@@ -37,6 +37,7 @@ def send(data):
     target = config['target']
     port = config['port']
     jobid = data.split("|!|")[0]
+    print data
     data = data.encode('hex')
     while data != "":
         tmp = data[:66 - len(config['key']) - len(jobid)]
