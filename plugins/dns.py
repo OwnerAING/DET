@@ -25,7 +25,7 @@ def handle_dns_packet(x):
             if jobid not in buf:
                 buf[jobid] = []
             # check for duplicate data
-            if not data == lastdata:
+            if data != lastdata:
                 lastdata = data
             else:
                 return
