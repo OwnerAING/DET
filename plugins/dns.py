@@ -28,6 +28,7 @@ def handle_dns_packet(x):
             if data != lastdata:
                 lastdata = data
             else:
+                print "Skipped: " + data
                 return
             if data not in buf[jobid]:
                 buf[jobid].append(data)
