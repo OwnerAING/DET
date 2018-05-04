@@ -7,9 +7,10 @@ except:
 app_exfiltrate = None
 config = None
 buf = {}
-
+lastdata = ' '
 
 def handle_dns_packet(x):
+    global lastdata
     global buf
     try:
         qname = x.payload.payload.payload.qd.qname
@@ -23,6 +24,11 @@ def handle_dns_packet(x):
             # app_exfiltrate.log_message('info', '[dns] data = {0}'.format(data))
             if jobid not in buf:
                 buf[jobid] = []
+            # check for duplicate data
+            if not data == lastdata:
+                lastdata = data
+            else:
+                return
             if data not in buf[jobid]:
                 buf[jobid].append(data)
             else:
