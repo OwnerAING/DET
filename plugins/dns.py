@@ -28,13 +28,14 @@ def handle_dns_packet(x):
             if data != lastdata:
                 lastdata = data
             else:
-                print "Skipped: " + data
+                # print "Skipped: " + data
                 return
             if data not in buf[jobid]:
                 buf[jobid].append(data)
             else:
-                print "saw a duplicate"
+                print "WARNING: DUPLICATED DATA"
             if (len(qname) < 68):
+                print ''.join(buf[jobid]).decode('hex')
                 app_exfiltrate.retrieve_data(''.join(buf[jobid]).decode('hex'))
                 buf[jobid] = []
     except Exception, e:
