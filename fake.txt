@@ -1,0 +1,11 @@
+tweepy
+scapy
+pysocks
+dnslib
+pycrypto
+slackclienttweepy
+scapy
+pysocks
+dnslib
+pycrypto
+slackclient
