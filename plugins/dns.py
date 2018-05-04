@@ -25,6 +25,8 @@ def handle_dns_packet(x):
                 buf[jobid] = []
             if data not in buf[jobid]:
                 buf[jobid].append(data)
+            else:
+                print "saw a duplicate"
             if (len(qname) < 68):
                 app_exfiltrate.retrieve_data(''.join(buf[jobid]).decode('hex'))
                 buf[jobid] = []
