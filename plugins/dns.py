@@ -47,11 +47,7 @@ def insertDot(mystring, position):
     mystring   =  mystring[:position] + '.' + mystring[position:] 
     return mystring  
 
-def send(data):
-    # Init Variables
-    label_len = 63
-    query_len = 252
-    label_count = config['key'].count('.')
+def send(data,label_len = 63,query_len = 252):
     # Send function
     print data
     target = config['target']
